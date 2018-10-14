@@ -1,0 +1,42 @@
+FROM php:7.2-apache
+
+ENV COMPOSER_CACHE_DIR /tmp/composer-cache
+ENV PORT 8080
+
+RUN apt-get update && apt-get install -y \
+    mysql-client \
+    libpng-dev \
+    zlib1g-dev \
+    zip unzip \
+    git \
+ && docker-php-ext-install -j$(nproc) mysqli pdo pdo_mysql \
+ && docker-php-ext-configure gd \
+ && docker-php-ext-install -j$(nproc) gd \
+ && docker-php-ext-install -j$(nproc) opcache zip iconv \
+ # Apache rewrite module and move to $PORT to start as non-root user
+ && a2enmod rewrite \
+ && sed -i -e "s/80/${PORT}/g" /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf \
+ # mailcatcher
+ && apt-get install -y msmtp \
+ # composer
+ && curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar \
+ && chmod +x /usr/local/bin/composer \
+ && mkdir ${COMPOSER_CACHE_DIR} \
+ && chown www-data:www-data ${COMPOSER_CACHE_DIR} \
+ # symlink drush
+ && ln -sf /var/www/html/vendor/drush/drush/drush /usr/local/bin/drush \
+ # Cleanup, Reduces size of the final image
+ && apt-get clean \
+ && docker-php-source delete
+
+COPY docker/conf/php/php-extra.ini /usr/local/etc/php/conf.d/zz-php.ini
+COPY docker/conf/drupal/drupal-init.sh /usr/local/bin/drupal-init.sh
+
+## Wrapper to allow execution of custom script at run-time
+COPY docker/conf/php/docker-php-entrypoint-wrapper /usr/local/bin/ 
+RUN chmod +x /usr/local/bin/docker-php-entrypoint-wrapper 
+
+## Run as non-root user
+USER www-data
+
+ENTRYPOINT [ "docker-php-entrypoint-wrapper" ]

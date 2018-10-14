@@ -1,0 +1,11 @@
+#!/bin/sh
+set -e
+  
+if [ $# -gt 0 ]
+then
+  "$@"
+  
+  exec docker-php-entrypoint apache2-foreground
+else
+  exec docker-php-entrypoint "$@"
+fi
