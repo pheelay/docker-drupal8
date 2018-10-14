@@ -1,12 +1,12 @@
 # Docker developer stack for Drupal 8
 
 ## Goals
-- Fully functional site in less than 5 minutes
-- Install & maintain latest version using composer
-- drush command-line utility
-- Working email system
-- Varnish frontend cache
-- Ready to deploy to a swarm/cloud
+- Fully functional Drupal site in 10 minutes.
+- Install & maintain latest version using composer.
+- drush command-line utility.
+- Working email system suitable for testing & development.
+- Varnish frontend cache.
+- Ready to deploy to a swarm/cloud.
 
 ## Requirements
 * Docker
@@ -49,6 +49,6 @@ The stack is targeted at developers. Consider the following before deploying to 
 - Drupal may need to be configured with Varnish for cache to work correctly.
 - Complete the Drupal configuration (tmp/private folders, cron, Trusted Host setting).
 - Include some sample content.
-- Drupal update is not yet tested.
+- Drupal update (composer) is not yet tested.
 - Option to mount the Drupal html volume on the host which allows read & write and works on all platforms.
 
