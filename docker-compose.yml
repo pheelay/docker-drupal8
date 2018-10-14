@@ -1,0 +1,58 @@
+## 
+# docker-drupal8
+#
+# Create a new Drupal site on docker
+#
+# Author: Phil Franks 
+# GitHub: https://github.com/pheelay/docker-drupal8
+# Date:   2018-10-13
+#
+version: '3'
+
+volumes:
+  composer-cache:
+  mysql:
+
+services:
+
+  varnish:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile-varnish
+    ports:
+    - "80:80"
+    depends_on: 
+    - drupal
+
+  drupal:
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile-php
+    environment:
+    - SITE_NAME=Drupal Test Site
+    - MYSQL_HOSTNAME=mysql
+    - MYSQL_USERNAME=root
+    - MYSQL_PASSWORD=test
+    - MYSQL_DATABASE=drupal    
+    volumes:
+    # Uncommented to mount codebase on the host, for development
+    #- ./html:/var/www/html
+    - composer-cache:/tmp/composer-cache
+    command:
+    - sh
+    - /usr/local/bin/drupal-init.sh
+      
+  mysql:
+    image: mysql:5.6
+    environment:
+    - MYSQL_ROOT_PASSWORD=test
+    - MYSQL_DATABASE=drupal
+    volumes:
+    - mysql:/var/lib/mysql
+    ports:
+    - "3306:3306"
+
+  mailcatcher:
+    image: schickling/mailcatcher
+    ports:
+    - "1080:1080"
