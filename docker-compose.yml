@@ -35,7 +35,7 @@ services:
     - MYSQL_PASSWORD=test
     - MYSQL_DATABASE=drupal    
     volumes:
-    # Uncommented to mount codebase on the host, for development
+    # Uncomment to mount codebase on the host, for development
     #- ./html:/var/www/html
     - composer-cache:/tmp/composer-cache
     command:
